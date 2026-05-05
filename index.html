@@ -344,11 +344,12 @@ function lU(e){try{const d=JSON.parse(localStorage.getItem('aw3_'+e.replace(/[^a
 
 function genCode(){return String(Math.floor(100000+Math.random()*900000))}
 function sendOTP(email,code){
-    return emailjs.send(EJS_SERVICE_ID,EJS_TEMPLATE_ID,{
-        to_email:email,
-        to_name:email.split('@')[0],
-        message:'كود التحقق الخاص بك هو: '+code
-    });
+    var templateParams = {
+        user_email: email,
+        user_name: email.split('@')[0],
+        verification_code: code
+    };
+    return emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_ID, templateParams);
 }
 function startCodeTimer(){clearInterval(codeTimer);let sec=60;const btn=document.getElementById('resendBtn');const sp=document.getElementById('timerSec');btn.disabled=true;btn.innerHTML='إعادة إرسال الكود (<span id="timerSec">60</span>ث)';codeTimer=setInterval(()=>{sec--;const s=document.getElementById('timerSec');if(s)s.textContent=sec;if(sec<=0){clearInterval(codeTimer);btn.disabled=false;btn.textContent='إعادة إرسال الكود'}},1000)}
 
