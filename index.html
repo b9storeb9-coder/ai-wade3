@@ -199,6 +199,14 @@
         .acc-sw .swe{font-size:10px;color:var(--t3)}
         .acc-sw .swa{width:22px;height:22px;background:none;border:none;color:var(--t3);cursor:pointer;border-radius:4px;display:grid;place-items:center;transition:.12s;font-size:9px}
         .acc-sw .swa:hover{background:var(--redB);color:var(--red)}
+        .pw-toggle{position:absolute;left:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;padding:4px;font-size:11px;transition:.15s}
+        .pw-toggle:hover{color:var(--t2)}
+        .pw-container{position:relative}
+        .info-box{background:var(--bg3);border:1px solid var(--b1);border-radius:8px;padding:12px;margin-bottom:16px}
+        .info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--b1)}
+        .info-row:last-child{border-bottom:none}
+        .info-label{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:5px}
+        .info-value{font-size:12px;color:var(--t1);font-weight:500;direction:ltr;text-align:left}
         .lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:999;align-items:center;justify-content:center;cursor:zoom-out}
         .lb.on{display:flex}.lb img{max-width:90%;max-height:90%;border-radius:7px;object-fit:contain}
         .tst{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:4px;align-items:center}
@@ -270,8 +278,52 @@
     <div class="mod">
         <div class="mod-h"><h2><i class="fas fa-cog"></i> الإعدادات</h2><button class="mod-x" onclick="clsSet()"><i class="fas fa-xmark"></i></button></div>
         <div class="mod-b">
-            <div class="sg"><div class="sl"><i class="fas fa-user"></i> اسم الحساب</div><input type="text" class="s-inp" id="sDN" placeholder="أدخل اسمك"></div>
-            <div class="sg"><div class="sl"><i class="fas fa-envelope"></i> البريد الإلكتروني</div><input type="email" class="s-inp" id="sEM" disabled></div>
+            <div class="sg">
+                <div class="sl"><i class="fas fa-info-circle"></i> معلومات الحساب</div>
+                <div class="info-box">
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-user"></i> اسم المستخدم</span>
+                        <span class="info-value" id="infoName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-envelope"></i> البريد الإلكتروني</span>
+                        <span class="info-value" id="infoEmail">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-lock"></i> كلمة المرور</span>
+                        <span class="info-value" id="infoPassword">••••••••</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sg">
+                <div class="sl"><i class="fas fa-user-edit"></i> تعديل الاسم</div>
+                <input type="text" class="s-inp" id="sDN" placeholder="أدخل اسمك الجديد">
+            </div>
+            <div class="sg">
+                <div class="sl"><i class="fas fa-key"></i> تغيير كلمة المرور</div>
+                <div class="f-group">
+                    <label class="f-label">كلمة المرور الحالية</label>
+                    <div class="pw-container">
+                        <input type="password" class="s-inp" id="sCurPw" placeholder="أدخل كلمة المرور الحالية" style="padding-left:35px">
+                        <button class="pw-toggle" onclick="togglePwVisibility('sCurPw', this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <div class="f-group">
+                    <label class="f-label">كلمة المرور الجديدة</label>
+                    <div class="pw-container">
+                        <input type="password" class="s-inp" id="sNewPw" placeholder="أنشئ كلمة مرور جديدة" style="padding-left:35px">
+                        <button class="pw-toggle" onclick="togglePwVisibility('sNewPw', this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <div class="f-group">
+                    <label class="f-label">تأكيد كلمة المرور الجديدة</label>
+                    <div class="pw-container">
+                        <input type="password" class="s-inp" id="sNewPw2" placeholder="أعد كتابة كلمة المرور الجديدة" style="padding-left:35px">
+                        <button class="pw-toggle" onclick="togglePwVisibility('sNewPw2', this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <button class="sbtn" onclick="changePassword()"><i class="fas fa-key"></i> تغيير كلمة المرور</button>
+            </div>
             <div class="sdiv"></div>
             <div class="sg"><div class="sl"><i class="fas fa-arrows-rotate"></i> تبديل الحسابات</div><div id="swAccs"></div></div>
             <div class="sdiv"></div>
@@ -309,7 +361,7 @@
 <script>
 const EJS_PUBLIC_KEY='qrPw0tM-gyuJWDxAA';
 const EJS_SERVICE_ID='service_xqu9htx';
-const EJS_TEMPLATE_ID='template_nxubgyu';
+const EJS_TEMPLATE_ID='template_uvn6hmb';
 emailjs.init(EJS_PUBLIC_KEY);
 
 const _c=document.createElement('canvas'),_x=_c.getContext('2d');
@@ -393,9 +445,58 @@ function drLA(){const a=gAcc();const el=document.getElementById('lgAccs');if(!a.
 function drSwAccs(){const a=gAcc();const el=document.getElementById('swAccs');if(!a.length){el.innerHTML='<div style="font-size:10px;color:var(--t3);padding:6px 0">لا توجد حسابات أخرى</div>';return}el.innerHTML=a.map(x=>{if(cu&&x.e===cu.email)return'';const dp=x.p||defAvatar(x.n);const ico=x.t==='google'?' <i class="fab fa-google" style="color:var(--t3);font-size:8px"></i>':'';return`<div class="acc-sw" onclick="swAccFromSet('${x.e}')"><img src="${dp}" alt=""><div class="swi"><div class="swn">${esc(x.n)}${ico}</div><div class="swe">${esc(x.e)}</div></div><button class="swa" onclick="rmAccAction('${x.e}',event)" title="حذف"><i class="fas fa-trash"></i></button></div>`}).join('');if(!el.innerHTML.trim())el.innerHTML='<div style="font-size:10px;color:var(--t3);padding:6px 0">لا توجد حسابات أخرى</div>'}
 function updPF(){if(!cu)return;const dp=cu.pic||defAvatar(cu.dn);document.getElementById('pfI').src=dp;document.getElementById('pfN').textContent=cu.dn;document.getElementById('pfE').textContent=cu.email}
 
-function opnSet(){if(!cu)return;document.getElementById('sDN').value=cu.dn||'';document.getElementById('sEM').value=cu.email;drSwAccs();document.getElementById('setM').classList.add('on')}
+function opnSet(){if(!cu)return;document.getElementById('sDN').value=cu.dn||'';document.getElementById('sCurPw').value='';document.getElementById('sNewPw').value='';document.getElementById('sNewPw2').value='';
+    
+    // عرض معلومات الحساب
+    document.getElementById('infoName').textContent=cu.dn||'-';
+    document.getElementById('infoEmail').textContent=cu.email||'-';
+    document.getElementById('infoPassword').textContent='••••••••';
+    
+    drSwAccs();document.getElementById('setM').classList.add('on')}
 function clsSet(){document.getElementById('setM').classList.remove('on')}
-function savSet(){const n=document.getElementById('sDN').value.trim();if(n){cu.dn=n;localStorage.setItem('aw3_cur',JSON.stringify({email:cu.email,dn:n,pic:cu.pic,type:cu.type}));const db=gDB();if(db[cu.email]){db[cu.email].nm=n;sDB(db)}const a=gAcc();const f=a.find(x=>x.e===cu.email);if(f){f.n=n;sAcc(a)}}updPF();sU();clsSet();toast('تم حفظ الإعدادات','ok')}
+function savSet(){const n=document.getElementById('sDN').value.trim();if(n){cu.dn=n;localStorage.setItem('aw3_cur',JSON.stringify({email:cu.email,dn:n,pic:cu.pic,type:cu.type}));const db=gDB();if(db[cu.email]){db[cu.email].nm=n;sDB(db)}const a=gAcc();const f=a.find(x=>x.e===cu.email);if(f){f.n=n;sAcc(a)}}updPF();sU();opnSet();toast('تم حفظ الإعدادات','ok')}
+
+async function changePassword(){
+    const curPw=document.getElementById('sCurPw').value;
+    const newPw=document.getElementById('sNewPw').value;
+    const newPw2=document.getElementById('sNewPw2').value;
+    
+    if(!curPw){toast('أدخل كلمة المرور الحالية','er');return}
+    
+    if(newPw.length<6){toast('كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل','er');return}
+    
+    if(newPw!==newPw2){toast('كلمة المرور الجديدة غير متطابقة','er');return}
+    
+    const db=gDB();
+    const user=db[cu.email];
+    
+    if(!user){toast('خطأ في العثور على بيانات المستخدم','er');return}
+    
+    const curHash=await hPw(curPw);
+    if(curHash!==user.pw){toast('كلمة المرور الحالية خاطئة','er');return}
+    
+    const newHash=await hPw(newPw);
+    user.pw=newHash;
+    sDB(db);
+    
+    // مسح حقول كلمة المرور
+    document.getElementById('sCurPw').value='';
+    document.getElementById('sNewPw').value='';
+    document.getElementById('sNewPw2').value='';
+    
+    toast('تم تغيير كلمة المرور بنجاح','ok');
+}
+
+function togglePwVisibility(inputId, btn){
+    const input=document.getElementById(inputId);
+    if(input.type==='password'){
+        input.type='text';
+        btn.innerHTML='<i class="fas fa-eye-slash"></i>';
+    }else{
+        input.type='password';
+        btn.innerHTML='<i class="fas fa-eye"></i>';
+    }
+}
 
 const uid=()=>'c'+Date.now()+Math.random().toString(36).slice(2,6);
 function gCh(){return C.find(c=>c.id===aId)||null}
